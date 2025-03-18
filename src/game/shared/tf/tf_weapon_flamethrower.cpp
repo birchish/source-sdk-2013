@@ -724,7 +724,7 @@ void CTFFlameThrower::PrimaryAttack()
 	// Make sure the weapon can't fire in this condition by tracing a line between the eye point and the end of the muzzle.
 	trace_t trace;	
 	Vector vecEye = pOwner->EyePosition();
-	Vector vecMuzzlePos = GetVisualMuzzlePos();
+	Vector vecMuzzlePos = GetFlameOriginPos();
 	CTraceFilterIgnoreObjects traceFilter( this, COLLISION_GROUP_NONE );
 	UTIL_TraceLine( vecEye, vecMuzzlePos, MASK_SOLID, &traceFilter, &trace );
 	if ( trace.fraction < 1.0 && ( !trace.m_pEnt || trace.m_pEnt->m_takedamage == DAMAGE_NO ) )
@@ -2121,6 +2121,13 @@ Vector CTFFlameThrower::GetMuzzlePosHelper( bool bVisualPos )
 			UTIL_StringToVector( vecOffset.Base(), tf_flamethrower_new_flame_offset.GetString() );
 
 			vecOffset *= pOwner->GetModelScale();
+
+			// Inverts the horizontal offset for flipped view models.
+			if ( IsViewModelFlipped() )
+			{
+				vecOffset.y *= -1;
+			}
+
 			vecMuzzlePos = pOwner->EyePosition() + vecOffset.x * vecForward + vecOffset.y * vecRight + vecOffset.z * vecUp;
 		}
 	}
